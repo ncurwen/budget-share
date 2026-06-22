@@ -1,0 +1,10 @@
+<%# locals: date, path_proc (lambda taking a Date -> url) %>
+<% prev_month = date.prev_month %>
+<% next_month = date.next_month %>
+<div class="flex items-center justify-between gap-2 mb-4">
+  <%= link_to "‹ #{month_label(prev_month)}", path_proc.call(prev_month),
+        class: "btn btn-ghost btn-sm" %>
+  <h1 class="text-xl font-bold"><%= month_label(date) %></h1>
+  <%= link_to "#{month_label(next_month)} ›", path_proc.call(next_month),
+        class: "btn btn-ghost btn-sm" %>
+</div>

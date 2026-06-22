@@ -1,0 +1,8 @@
+<%# locals: record %>
+<% if record.errors.any? %>
+  <div class="alert alert-error text-sm mb-3" role="alert">
+    <ul class="list-disc list-inside">
+      <% record.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+    </ul>
+  </div>
+<% end %>

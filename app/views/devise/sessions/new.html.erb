@@ -1,0 +1,33 @@
+<div class="min-h-[70vh] flex items-center justify-center">
+  <div class="card w-full max-w-sm bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h1 class="text-2xl font-bold text-center">💸 BudgetShare</h1>
+      <p class="text-center text-base-content/60 mb-2">Log in to your household</p>
+
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+        <fieldset class="fieldset">
+          <label class="label" for="user_email">Email</label>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                class: "input input-bordered w-full", placeholder: "you@example.com" %>
+
+          <label class="label mt-2" for="user_password">Password</label>
+          <%= f.password_field :password, autocomplete: "current-password",
+                class: "input input-bordered w-full", placeholder: "••••••••" %>
+
+          <% if devise_mapping.rememberable? %>
+            <label class="label cursor-pointer justify-start gap-2 mt-2">
+              <%= f.check_box :remember_me, class: "checkbox checkbox-sm" %>
+              <span>Remember me</span>
+            </label>
+          <% end %>
+
+          <%= f.submit "Log in", class: "btn btn-primary w-full mt-4" %>
+        </fieldset>
+      <% end %>
+
+      <%= render "devise/shared/links" %>
+    </div>
+  </div>
+</div>

@@ -41,5 +41,16 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    def create_user(name:, email: nil, password: "password123")
+      User.create!(name:, email: email || "#{name.parameterize}@example.com", password:)
+    end
+
+    # Builds a household and assigns the given users to it.
+    def create_household(name: "Test House", users:)
+      household = Household.create!(name:)
+      users.each { |user| user.update!(household:) }
+      household
+    end
   end
 end

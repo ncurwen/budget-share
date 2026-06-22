@@ -1,0 +1,55 @@
+<% content_for :title, "#{@household.name} · BudgetShare" %>
+
+<div class="flex items-center gap-2 mb-4">
+  <%= link_to "‹ Overview", root_path, class: "btn btn-ghost btn-sm" %>
+  <h1 class="text-xl font-bold"><%= @household.name %></h1>
+</div>
+
+<div class="grid md:grid-cols-2 gap-4">
+  <%# Members %>
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base">Members</h2>
+      <ul class="divide-y divide-base-200">
+        <% @household.users.order(:name).each do |member| %>
+          <li class="py-2">
+            <span class="font-medium"><%= member.name %></span>
+            <% if member == current_user %><span class="text-xs text-base-content/50">(you)</span><% end %>
+            <div class="text-xs text-base-content/50"><%= member.email %></div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <%# Invite a partner %>
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base">Invite your partner</h2>
+      <%= form_with model: @invitation, url: household_invitations_path do |f| %>
+        <div class="join w-full">
+          <%= f.email_field :email, required: true, placeholder: "partner@example.com",
+                class: "input input-bordered join-item w-full" %>
+          <%= f.submit "Invite", class: "btn btn-primary join-item" %>
+        </div>
+      <% end %>
+
+      <% if @pending_invitations.any? %>
+        <h3 class="font-medium text-sm mt-4">Pending invites</h3>
+        <ul class="space-y-2 mt-1">
+          <% @pending_invitations.each do |invitation| %>
+            <li class="text-sm">
+              <div class="font-medium"><%= invitation.email %></div>
+              <div class="flex items-center gap-1">
+                <input type="text" readonly value="<%= accept_invitation_url(invitation.token) %>"
+                  class="input input-bordered input-xs w-full font-mono"
+                  onclick="this.select()" />
+              </div>
+              <span class="text-xs text-base-content/50">Share this link so they can join.</span>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  </div>
+</div>

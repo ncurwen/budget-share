@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="light" data-controller="theme">
   <head>
     <title><%= content_for(:title) || "BudgetShare" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -24,7 +24,18 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="min-h-screen bg-base-200">
+    <% if user_signed_in? && current_household.present? %>
+      <%= render "layouts/navbar" %>
+    <% end %>
+
+    <%= render "layouts/flash" %>
+
+    <main class="container mx-auto max-w-5xl px-4 py-6">
+      <%= yield %>
+    </main>
+
+    <%# Turbo Frame that modal forms (new/edit) load into. %>
+    <%= turbo_frame_tag "modal" %>
   </body>
 </html>

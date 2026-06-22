@@ -1,0 +1,82 @@
+<% content_for :title, "#{month_label(@date)} · BudgetShare" %>
+
+<%= render "shared/month_nav", date: @date, path_proc: ->(d) { month_path(d.year, d.month) } %>
+
+<%# Summary stats %>
+<div class="stats stats-vertical sm:stats-horizontal shadow w-full bg-base-100 mb-6">
+  <div class="stat">
+    <div class="stat-title">Spent this month</div>
+    <div class="stat-value text-primary"><%= cents_to_currency(@statement.total_spent_cents) %></div>
+    <div class="stat-desc">of <%= cents_to_currency(@statement.total_target_cents) %> budgeted</div>
+  </div>
+  <div class="stat">
+    <div class="stat-title">Shared</div>
+    <div class="stat-value text-2xl"><%= cents_to_currency(@statement.shared_spent_cents) %></div>
+    <div class="stat-desc">split 50/50</div>
+  </div>
+  <div class="stat">
+    <div class="stat-title">Personal</div>
+    <div class="stat-value text-2xl"><%= cents_to_currency(@statement.personal_spent_cents) %></div>
+    <div class="stat-desc">not split</div>
+  </div>
+</div>
+
+<%# Square-up card %>
+<%= render "overview/square_up", statement: @statement, date: @date %>
+
+<%# Budget vs target %>
+<div class="card bg-base-100 shadow mb-6">
+  <div class="card-body">
+    <h2 class="card-title text-base">Budget vs target</h2>
+    <% if @statement.category_rows.empty? %>
+      <p class="text-base-content/60 text-sm">
+        No categories yet. <%= link_to "Add one", new_category_path, class: "link", data: { turbo_frame: "modal" } %> to start budgeting.
+      </p>
+    <% else %>
+      <div class="space-y-3">
+        <% @statement.category_rows.each do |row| %>
+          <div>
+            <div class="flex justify-between text-sm mb-1">
+              <span><%= category_badge(row.category) %></span>
+              <span class="font-mono <%= "text-error" if row.over_budget? %>">
+                <%= cents_to_currency(row.spent_cents) %> / <%= cents_to_currency(row.target_cents) %>
+              </span>
+            </div>
+            <progress
+              class="progress <%= row.over_budget? ? "progress-error" : "progress-primary" %> w-full"
+              value="<%= row.percent || 0 %>" max="100"></progress>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%# Recent expenses %>
+<div class="card bg-base-100 shadow">
+  <div class="card-body">
+    <div class="flex justify-between items-center">
+      <h2 class="card-title text-base">Expenses</h2>
+      <%= link_to "+ Add expense", new_expense_path, data: { turbo_frame: "modal" },
+            class: "btn btn-primary btn-sm" %>
+    </div>
+
+    <% if @expenses.empty? %>
+      <p class="text-base-content/60 text-sm py-4">No expenses logged this month yet.</p>
+    <% else %>
+      <div class="overflow-x-auto">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Date</th><th>Title</th><th>Category</th><th>Paid by</th>
+              <th>Split</th><th class="text-right">Amount</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <%= render @expenses %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</div>

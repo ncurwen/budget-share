@@ -1,0 +1,26 @@
+<tr id="<%= dom_id(expense) %>">
+  <td class="whitespace-nowrap text-sm"><%= l(expense.paid_on, format: :short) %></td>
+  <td>
+    <div class="font-medium"><%= expense.title %></div>
+    <% if expense.description.present? %>
+      <div class="text-xs text-base-content/60"><%= expense.description %></div>
+    <% end %>
+  </td>
+  <td><%= category_badge(expense.category) %></td>
+  <td class="text-sm"><%= expense.payer.name %></td>
+  <td>
+    <% if expense.shared? %>
+      <span class="badge badge-ghost badge-sm">Shared</span>
+    <% else %>
+      <span class="badge badge-outline badge-sm">Personal</span>
+    <% end %>
+  </td>
+  <td class="text-right font-mono whitespace-nowrap"><%= cents_to_currency(expense.amount_cents) %></td>
+  <td class="text-right whitespace-nowrap">
+    <%= link_to "Edit", edit_expense_path(expense),
+          data: { turbo_frame: "modal" }, class: "btn btn-ghost btn-xs" %>
+    <%= button_to "Delete", expense_path(expense), method: :delete,
+          class: "btn btn-ghost btn-xs text-error",
+          form: { data: { turbo_confirm: "Delete “#{expense.title}”?" } } %>
+  </td>
+</tr>

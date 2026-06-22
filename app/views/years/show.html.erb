@@ -1,0 +1,59 @@
+<% content_for :title, "#{@year} · BudgetShare" %>
+
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-bold">Year overview</h1>
+  <div class="join">
+    <%= link_to "‹ #{@year - 1}", year_path(@year - 1), class: "btn btn-sm join-item" %>
+    <span class="btn btn-sm join-item no-animation"><%= @year %></span>
+    <%= link_to "#{@year + 1} ›", year_path(@year + 1), class: "btn btn-sm join-item" %>
+  </div>
+</div>
+
+<div class="card bg-base-100 shadow">
+  <div class="card-body overflow-x-auto">
+    <% if @statement.rows.empty? %>
+      <p class="text-base-content/60 text-sm py-4 text-center">No categories to report on yet.</p>
+    <% else %>
+      <table class="table table-xs">
+        <thead>
+          <tr>
+            <th class="sticky left-0 bg-base-100">Category</th>
+            <% (1..12).each do |m| %>
+              <th class="text-right"><%= Date::ABBR_MONTHNAMES[m] %></th>
+            <% end %>
+            <th class="text-right font-bold">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @statement.rows.each do |row| %>
+            <tr>
+              <td class="sticky left-0 bg-base-100"><%= category_badge(row.category) %></td>
+              <% (1..12).each do |m| %>
+                <% spent = row.spent_cents(m); target = row.target_cents(m) %>
+                <td class="text-right font-mono <%= "text-error" if target.positive? && spent > target %>">
+                  <%= spent.zero? ? "—" : cents_to_currency(spent, precision: 0) %>
+                </td>
+              <% end %>
+              <td class="text-right font-mono font-bold">
+                <%= cents_to_currency(row.total_spent_cents, precision: 0) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr class="font-bold">
+            <td class="sticky left-0 bg-base-100">Total</td>
+            <% (1..12).each do |m| %>
+              <td class="text-right font-mono"><%= cents_to_currency(@statement.total_spent_cents(m), precision: 0) %></td>
+            <% end %>
+            <td class="text-right font-mono"><%= cents_to_currency(@statement.grand_total_spent_cents, precision: 0) %></td>
+          </tr>
+        </tfoot>
+      </table>
+      <p class="text-xs text-base-content/50 mt-2">
+        Year target: <%= cents_to_currency(@statement.grand_total_target_cents) %> ·
+        Spent: <%= cents_to_currency(@statement.grand_total_spent_cents) %>
+      </p>
+    <% end %>
+  </div>
+</div>

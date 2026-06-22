@@ -1,0 +1,48 @@
+<% content_for :title, "Expenses · BudgetShare" %>
+
+<%= render "shared/month_nav", date: @date,
+      path_proc: ->(d) { expenses_path(year: d.year, month: d.month, category_id: params[:category_id]) } %>
+
+<div class="card bg-base-100 shadow">
+  <div class="card-body">
+    <div class="flex justify-between items-center gap-2 flex-wrap">
+      <%# Category filter %>
+      <%= form_with url: expenses_path, method: :get, data: { turbo_action: "replace" }, class: "flex gap-2 items-center" do %>
+        <%= hidden_field_tag :year, @date.year %>
+        <%= hidden_field_tag :month, @date.month %>
+        <%= select_tag :category_id,
+              options_from_collection_for_select(@categories, :id, :name, params[:category_id]),
+              include_blank: "All categories", class: "select select-bordered select-sm",
+              onchange: "this.form.requestSubmit()" %>
+      <% end %>
+
+      <%= link_to "+ Add expense", new_expense_path, data: { turbo_frame: "modal" },
+            class: "btn btn-primary btn-sm" %>
+    </div>
+
+    <% if @expenses.empty? %>
+      <p class="text-base-content/60 text-sm py-6 text-center">No expenses match.</p>
+    <% else %>
+      <div class="overflow-x-auto mt-2">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Date</th><th>Title</th><th>Category</th><th>Paid by</th>
+              <th>Split</th><th class="text-right">Amount</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <%= render @expenses %>
+          </tbody>
+          <tfoot>
+            <tr class="font-semibold">
+              <td colspan="5" class="text-right">Total</td>
+              <td class="text-right font-mono"><%= cents_to_currency(@expenses.sum(&:amount_cents)) %></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</div>

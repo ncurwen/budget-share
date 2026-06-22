@@ -19,6 +19,15 @@ gem "cssbundling-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# Authentication [https://github.com/heartcombo/devise]
+gem "devise"
+# Authorization [https://github.com/varvet/pundit]
+gem "pundit"
+
+gem "view_component", "~> 4.12"
+
+gem "lucide-rails", "~> 0.7"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 

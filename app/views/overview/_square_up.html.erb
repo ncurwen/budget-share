@@ -1,0 +1,39 @@
+<%# locals: statement, date %>
+<% settlement = statement.settlement %>
+<% if settlement&.settled? %>
+  <div class="card bg-success/10 border border-success/30 shadow-sm mb-6">
+    <div class="card-body flex-row items-center justify-between flex-wrap gap-2">
+      <div>
+        <div class="font-semibold text-success">✓ Squared up</div>
+        <div class="text-sm">
+          <%= settlement.debtor.name %> paid <%= settlement.creditor.name %>
+          <span class="font-mono"><%= cents_to_currency(settlement.amount_cents) %></span>
+          on <%= l(settlement.settled_at.to_date, format: :short) %>.
+        </div>
+      </div>
+      <%= button_to "Reopen", settlement_path(settlement), method: :patch,
+            class: "btn btn-ghost btn-sm",
+            form: { data: { turbo_confirm: "Reopen this square-up?" } } %>
+    </div>
+  </div>
+<% else %>
+  <% square_up = statement.square_up %>
+  <div class="card bg-base-100 shadow-sm mb-6">
+    <div class="card-body flex-row items-center justify-between flex-wrap gap-2">
+      <% if square_up %>
+        <div>
+          <div class="text-sm text-base-content/60">Square-up</div>
+          <div class="text-lg">
+            <span class="font-semibold"><%= square_up.debtor.name %></span> owes
+            <span class="font-semibold"><%= square_up.creditor.name %></span>
+            <span class="font-mono text-primary"><%= cents_to_currency(square_up.amount_cents) %></span>
+          </div>
+        </div>
+        <%= button_to "Mark as squared up", settlements_path(year: date.year, month: date.month),
+              class: "btn btn-primary btn-sm" %>
+      <% else %>
+        <div class="text-base-content/70">🎉 All square this month — nothing to settle.</div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
