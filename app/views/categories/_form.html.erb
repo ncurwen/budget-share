@@ -3,7 +3,7 @@
 
   <fieldset class="fieldset">
     <label class="label" for="category_name">Name</label>
-    <%= f.text_field :name, class: "input input-bordered w-full", placeholder: "e.g. Groceries" %>
+    <%= f.text_field :name, class: "input input-bordered w-full", placeholder: "e.g. Groceries", autofocus: true %>
 
     <label class="label mt-2" for="category_color">Color</label>
     <%= f.select :color,
@@ -11,7 +11,7 @@
           { include_blank: "Default" }, class: "select select-bordered w-full" %>
 
     <div class="modal-action">
-      <button type="button" class="btn btn-ghost" data-action="modal#close">Cancel</button>
+      <button type="button" class="btn btn-ghost" data-action="dialog-component#close">Cancel</button>
       <%= f.submit category.persisted? ? "Save" : "Add category", class: "btn btn-primary" %>
     </div>
   </fieldset>

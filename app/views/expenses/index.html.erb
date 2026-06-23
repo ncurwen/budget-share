@@ -1,47 +1,59 @@
 <% content_for :title, "Expenses · BudgetShare" %>
 
 <%= render "shared/month_nav", date: @date,
-      path_proc: ->(d) { expenses_path(year: d.year, month: d.month, category_id: params[:category_id]) } %>
+      path_proc: ->(d) { expenses_path(year: d.year, month: d.month, q: params[:q]&.permit!) } %>
 
 <div class="card bg-base-100 shadow">
   <div class="card-body">
-    <div class="flex justify-between items-center gap-2 flex-wrap">
-      <%# Category filter %>
-      <%= form_with url: expenses_path, method: :get, data: { turbo_action: "replace" }, class: "flex gap-2 items-center" do %>
-        <%= hidden_field_tag :year, @date.year %>
-        <%= hidden_field_tag :month, @date.month %>
-        <%= select_tag :category_id,
-              options_from_collection_for_select(@categories, :id, :name, params[:category_id]),
-              include_blank: "All categories", class: "select select-bordered select-sm",
-              onchange: "this.form.requestSubmit()" %>
-      <% end %>
-
+    <div class="flex justify-end items-center gap-2 flex-wrap mb-2">
       <%= link_to "+ Add expense", new_expense_path, data: { turbo_frame: "modal" },
             class: "btn btn-primary btn-sm" %>
     </div>
 
-    <% if @expenses.empty? %>
-      <p class="text-base-content/60 text-sm py-6 text-center">No expenses match.</p>
-    <% else %>
-      <div class="overflow-x-auto mt-2">
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th>Date</th><th>Title</th><th>Category</th><th>Paid by</th>
-              <th>Split</th><th class="text-right">Amount</th><th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <%= render @expenses %>
-          </tbody>
-          <tfoot>
-            <tr class="font-semibold">
-              <td colspan="5" class="text-right">Total</td>
-              <td class="text-right font-mono"><%= cents_to_currency(@expenses.sum(&:amount_cents)) %></td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
+    <%= render TableComponent.new(
+          collection: @expenses,
+          partial: "expenses/expense",
+          as: :expense,
+          pagy: @pagy,
+          hidden_params: { year: @date.year, month: @date.month },
+          search_config: {
+            url: expenses_path,
+            attribute: :title_or_description_cont,
+            value: params.dig(:q, :title_or_description_cont),
+            placeholder: "Search expenses..."
+          },
+          filter_config: [
+            {
+              param: :shared_eq,
+              active: params.dig(:q, :shared_eq),
+              options: [
+                { value: true,  label: "Shared",   icon: "users", color: "badge-info" },
+                { value: false, label: "Personal", icon: "user",  color: "badge-ghost" }
+              ]
+            },
+            {
+              param: :category_id_eq,
+              active: params.dig(:q, :category_id_eq),
+              as: :select,
+              prompt: "All categories",
+              options: @categories.map { |c| { value: c.id, label: c.name } }
+            }
+          ]
+        ) do |t| %>
+      <% t.with_column { sort_link(@q, :paid_on, "Date") } %>
+      <% t.with_column { sort_link(@q, :title, "Title") } %>
+      <% t.with_column { "Category" } %>
+      <% t.with_column { "Paid by" } %>
+      <% t.with_column { "Split" } %>
+      <% t.with_column(css_class: "text-right") { sort_link(@q, :amount_cents, "Amount") } %>
+      <% t.with_column { "" } %>
+      <% t.with_empty_message { "No expenses match." } %>
+    <% end %>
+
+    <% if @expenses.any? %>
+      <div class="flex justify-end gap-3 items-baseline font-semibold mt-2 pr-2">
+        <span class="text-base-content/60">Total</span>
+        <span class="font-mono"><%= cents_to_currency(@total_cents) %></span>
       </div>
     <% end %>
   </div>

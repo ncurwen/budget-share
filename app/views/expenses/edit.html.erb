@@ -1,3 +1,6 @@
-<%= render layout: "shared/modal", locals: { title: "Edit expense" } do %>
-  <%= render "form", expense: @expense %>
+<%= turbo_frame_tag "modal" do %>
+  <%= render DialogComponent.new(open: true, close_on_backdrop: true) do |dialog| %>
+    <% dialog.with_title { "Edit expense" } %>
+    <% dialog.with_body { render "form", expense: @expense } %>
+  <% end %>
 <% end %>

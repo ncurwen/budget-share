@@ -6,6 +6,14 @@ class Category < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { scope: :household_id, case_sensitive: false }
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[name color position created_at]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    []
+  end
+
   # DaisyUI badge color suffixes available for categories.
   COLORS = %w[primary secondary accent info success warning error neutral].freeze
 

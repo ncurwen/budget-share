@@ -1,3 +1,6 @@
-<%= render layout: "shared/modal", locals: { title: "Add category" } do %>
-  <%= render "form", category: @category %>
+<%= turbo_frame_tag "modal" do %>
+  <%= render DialogComponent.new(open: true, close_on_backdrop: true) do |dialog| %>
+    <% dialog.with_title { "Add category" } %>
+    <% dialog.with_body { render "form", category: @category } %>
+  <% end %>
 <% end %>

@@ -28,6 +28,11 @@ gem "view_component", "~> 4.12"
 
 gem "lucide-rails", "~> 0.7"
 
+# Pagination [https://github.com/ddnexus/pagy]
+gem "pagy", "~> 9.3"
+# Search/filter query builder [https://github.com/activerecord-hackery/ransack]
+gem "ransack", "~> 4.2"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 

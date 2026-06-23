@@ -1,0 +1,9 @@
+<%= tooltip_tag(content, direction:) do %>
+  <time class="underline"
+        data-controller="timeago"
+        data-action="turbo:morph@window->timeago#connect"
+        data-timeago-add-suffix-value="<%= suffix %>"
+        data-timeago-datetime-value="<%= time.iso8601 %>"
+        data-timeago-refresh-interval-value="<%= TimeagoComponent::REFRESH_INTERVAL_MS %>">
+  </time>
+<% end %>

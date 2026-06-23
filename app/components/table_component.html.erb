@@ -1,6 +1,6 @@
-<% if filter_config? %>
+<% if badge_filter_configs.any? %>
   <div class="flex items-center gap-2 mb-4">
-    <% @filter_configs.each_with_index do |config, i| %>
+    <% badge_filter_configs.each_with_index do |config, i| %>
       <% if i > 0 %>
         <div class="w-px h-4 bg-base-content/20 shrink-0"></div>
       <% end %>
@@ -20,29 +20,37 @@
 <% if @search_config %>
   <div class="flex items-center join mb-4">
     <%= helpers.form_with url: @search_config[:url], method: :get, scope: :q,
-                          class: "grow", data: { turbo_action: "replace", controller: "auto-submit", auto_submit_delay_value: 500 } do |f| %>
-      <% if filter_config? %>
-        <% @filter_configs.each do |config| %>
-          <% if config[:active].present? %>
-            <%= f.hidden_field config[:param], value: config[:active] %>
-          <% end %>
+                          class: "flex flex-1 join min-w-0", data: { turbo_action: "replace", controller: "auto-submit", auto_submit_delay_value: 500 } do |f| %>
+      <% hidden_params.each do |name, value| %>
+        <%= helpers.hidden_field_tag name, value %>
+      <% end %>
+      <% badge_filter_configs.each do |config| %>
+        <% if config[:active].present? %>
+          <%= f.hidden_field config[:param], value: config[:active] %>
         <% end %>
       <% end %>
       <% if sort_param %>
         <%= helpers.hidden_field_tag "q[s]", sort_param %>
       <% end %>
-      <label class="input w-full join-item">
+      <% select_filter_configs.each do |config| %>
+        <%= f.select config[:param],
+                     helpers.options_for_select(config[:options].map { |o| [ o[:label], o[:value] ] }, config[:active]),
+                     { include_blank: config[:prompt] },
+                     class: "select join-item shrink-0",
+                     data: { action: "change->auto-submit#submit" } %>
+      <% end %>
+      <label class="input w-full join-item min-w-0">
         <%= lucide_icon("search", class: "w-4 h-4 text-base-content/50") %>
         <%= f.search_field @search_config[:attribute],
                            value: @search_config[:value],
                            placeholder: @search_config.fetch(:placeholder, "Search..."),
-                           class: "grow",
+                           class: "grow [&::-webkit-search-cancel-button]:appearance-none",
                            data: { turbo: { permanent: true },
                                    action: "input->auto-submit#submit" } %>
       </label>
     <% end %>
-    <%= tooltip_tag("Clear filters", css_class: clearable? ? "" : "cursor-not-allowed") do %>
-      <%= helpers.button_to @search_config[:url], method: :get, disabled: !clearable?,
+    <%= tooltip_tag("Clear filters", css_class: "shrink-0 #{'cursor-not-allowed' unless clearable?}".strip) do %>
+      <%= helpers.button_to @search_config[:url], method: :get, disabled: !clearable?, params: hidden_params,
                             class: helpers.token_list("btn btn-soft btn-error join-item", "btn-disabled": !clearable?),
                             form: { data: { turbo_action: "replace" } } do %>
         <%= lucide_icon("x", class: "w-4 h-4") %>
@@ -50,48 +58,55 @@
     <% end %>
   </div>
 <% end %>
-<table class="table w-full">
-  <thead>
-    <tr>
-      <% columns.each do |col| %>
-        <th class="text-xs sm:text-sm <%= col.css_class %>"><%= col %></th>
-      <% end %>
-      <% if show_actions? %><th class="text-xs sm:text-sm w-px whitespace-nowrap">Actions</th><% end %>
-    </tr>
-  </thead>
-  <tbody>
-    <% if truly_empty? && empty_message? %>
+<div class="overflow-x-auto">
+  <table class="table w-full">
+    <thead>
       <tr>
-        <td colspan="<%= total_colspan %>">
-          <div class="flex items-center gap-5 px-4 py-5">
-            <%= lucide_icon("inbox", class: "w-9 h-9 text-base-content/20 shrink-0") %>
-            <div class="flex items-center gap-4 grow flex-wrap">
-              <p class="text-base-content/50 grow"><%= empty_message %></p>
-              <% if @empty_message_button_config %>
-                <%= helpers.link_to @empty_message_button_config[:path],
-                                    class: "btn btn-primary btn-sm shrink-0",
-                                    data: { turbo_frame: @empty_message_button_config[:turbo_frame] }.compact do %>
-                  <%= lucide_icon("plus", class: "w-4 h-4") %><%= @empty_message_button_config[:label] %>
+        <% columns.each do |col| %>
+          <th class="text-xs sm:text-sm <%= col.css_class %>"><%= col %></th>
+        <% end %>
+        <% if show_actions? %><th class="text-xs sm:text-sm w-px whitespace-nowrap">Actions</th><% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% if truly_empty? && empty_message? %>
+        <tr>
+          <td colspan="<%= total_colspan %>">
+            <div class="flex items-center gap-5 px-4 py-5">
+              <%= lucide_icon("inbox", class: "w-9 h-9 text-base-content/20 shrink-0") %>
+              <div class="flex items-center gap-4 grow flex-wrap">
+                <p class="text-base-content/50 grow"><%= empty_message %></p>
+                <% if @empty_message_button_config %>
+                  <%= helpers.link_to @empty_message_button_config[:path],
+                                      class: "btn btn-primary btn-sm shrink-0",
+                                      data: { turbo_frame: @empty_message_button_config[:turbo_frame] }.compact do %>
+                    <%= lucide_icon("plus", class: "w-4 h-4") %><%= @empty_message_button_config[:label] %>
+                  <% end %>
                 <% end %>
-              <% end %>
+              </div>
             </div>
-          </div>
-        </td>
-      </tr>
-    <% elsif filtered_empty? %>
-      <tr>
-        <td colspan="<%= total_colspan %>">
-          <div role="alert" class="alert my-1 gap-3">
-            <%= lucide_icon("search-x", class: "w-5 h-5 text-base-content/40 shrink-0") %>
-            <span class="text-base-content/60 grow">
-              No results match your current <%= filter_active? ? "search or filter" : "search" %>.
-            </span>
-            <%= helpers.link_to "Reset", @search_config[:url], class: "btn btn-ghost btn-error btn-sm shrink-0" %>
-          </div>
-        </td>
-      </tr>
-    <% else %>
-      <%= render_rows %>
-    <% end %>
-  </tbody>
-</table>
+          </td>
+        </tr>
+      <% elsif filtered_empty? %>
+        <tr>
+          <td colspan="<%= total_colspan %>">
+            <div role="alert" class="alert my-1 gap-3">
+              <%= lucide_icon("search-x", class: "w-5 h-5 text-base-content/40 shrink-0") %>
+              <span class="text-base-content/60 grow">
+                No results match your current <%= filter_active? ? "search or filter" : "search" %>.
+              </span>
+              <%= helpers.link_to "Reset", reset_url, class: "btn btn-ghost btn-error btn-sm shrink-0" %>
+            </div>
+          </td>
+        </tr>
+      <% else %>
+        <%= render_rows %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+<% if @pagy %>
+  <div class="mt-4 flex justify-center">
+    <%= helpers.pagy_nav(@pagy) %>
+  </div>
+<% end %>

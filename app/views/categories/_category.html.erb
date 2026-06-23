@@ -1,0 +1,13 @@
+<tr id="<%= dom_id(category) %>">
+  <td><%= category_badge(category) %></td>
+  <td class="text-right font-mono">
+    <%= cents_to_currency(category.budget_targets.where(year: year).sum(:amount_cents)) %>
+  </td>
+  <td class="text-right whitespace-nowrap">
+    <%= link_to "Edit & targets", edit_category_path(category, year: year),
+          class: "btn btn-ghost btn-xs" %>
+    <%= button_to "Delete", category_path(category), method: :delete,
+          class: "btn btn-ghost btn-xs text-error",
+          form: { data: { turbo_confirm: "Delete “#{category.name}”?" } } %>
+  </td>
+</tr>

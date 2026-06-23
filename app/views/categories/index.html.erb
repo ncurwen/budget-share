@@ -15,35 +15,24 @@
 
 <div class="card bg-base-100 shadow">
   <div class="card-body">
-    <% if @categories.empty? %>
-      <p class="text-base-content/60 text-sm py-4 text-center">
-        No categories yet. Add one to start budgeting.
-      </p>
-    <% else %>
-      <div class="overflow-x-auto">
-        <table class="table">
-          <thead>
-            <tr><th>Category</th><th class="text-right"><%= @year %> target</th><th></th></tr>
-          </thead>
-          <tbody>
-            <% @categories.each do |category| %>
-              <tr>
-                <td><%= category_badge(category) %></td>
-                <td class="text-right font-mono">
-                  <%= cents_to_currency(category.budget_targets.where(year: @year).sum(:amount_cents)) %>
-                </td>
-                <td class="text-right whitespace-nowrap">
-                  <%= link_to "Edit & targets", edit_category_path(category, year: @year),
-                        class: "btn btn-ghost btn-xs" %>
-                  <%= button_to "Delete", category_path(category), method: :delete,
-                        class: "btn btn-ghost btn-xs text-error",
-                        form: { data: { turbo_confirm: "Delete “#{category.name}”?" } } %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+    <%= render TableComponent.new(
+          collection: @categories,
+          partial: "categories/category",
+          as: :category,
+          pagy: @pagy,
+          hidden_params: { year: @year },
+          search_config: {
+            url: categories_path,
+            attribute: :name_cont,
+            value: params.dig(:q, :name_cont),
+            placeholder: "Search categories..."
+          },
+          year: @year
+        ) do |t| %>
+      <% t.with_column { sort_link(@q, :name, "Category") } %>
+      <% t.with_column(css_class: "text-right") { "#{@year} target" } %>
+      <% t.with_column { "" } %>
+      <% t.with_empty_message { "No categories yet. Add one to start budgeting." } %>
     <% end %>
   </div>
 </div>

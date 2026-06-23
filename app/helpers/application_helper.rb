@@ -27,4 +27,12 @@ module ApplicationHelper
   def month_label(date)
     "#{MONTH_NAMES[date.month]} #{date.year}"
   end
+
+  # DaisyUI tooltip wrapper. Yields the trigger content; `text` becomes the tip.
+  # `direction` maps to a DaisyUI placement class (e.g. :top => "tooltip-top").
+  def tooltip_tag(text, css_class: "", direction: nil, &block)
+    placement = "tooltip-#{direction}" if direction
+    classes = [ "tooltip", placement, css_class.presence ].compact.join(" ")
+    content_tag(:span, capture(&block), class: classes, data: { tip: text })
+  end
 end

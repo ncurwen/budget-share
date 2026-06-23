@@ -5,10 +5,13 @@ class ExpensesController < ApplicationController
 
   def index
     @date = selected_month_date
-    scope = policy_scope(Expense).for_month(@date.year, @date.month)
-                                 .includes(:category, :user).recent_first
-    scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
-    @expenses = scope
+    base = policy_scope(Expense).for_month(@date.year, @date.month)
+                                .includes(:category, :user)
+    @q = base.ransack(params[:q])
+    @q.sorts = "paid_on desc" if @q.sorts.empty?
+    result = @q.result
+    @total_cents = result.sum(:amount_cents)
+    @pagy, @expenses = pagy(result)
     @categories = current_household.categories
   end
 

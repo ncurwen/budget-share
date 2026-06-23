@@ -61,22 +61,20 @@
             class: "btn btn-primary btn-sm" %>
     </div>
 
-    <% if @expenses.empty? %>
-      <p class="text-base-content/60 text-sm py-4">No expenses logged this month yet.</p>
-    <% else %>
-      <div class="overflow-x-auto">
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th>Date</th><th>Title</th><th>Category</th><th>Paid by</th>
-              <th>Split</th><th class="text-right">Amount</th><th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <%= render @expenses %>
-          </tbody>
-        </table>
-      </div>
+    <%= render TableComponent.new(
+          collection: @expenses,
+          partial: "expenses/expense",
+          as: :expense
+        ) do |t| %>
+      <% t.with_column { "Date" } %>
+      <% t.with_column { "Title" } %>
+      <% t.with_column { "Category" } %>
+      <% t.with_column { "Paid by" } %>
+      <% t.with_column { "Split" } %>
+      <% t.with_column(css_class: "text-right") { "Amount" } %>
+      <% t.with_column { "" } %>
+      <% t.with_empty_message { "No expenses logged this month yet." } %>
     <% end %>
+
   </div>
 </div>

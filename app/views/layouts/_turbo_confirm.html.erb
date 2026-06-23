@@ -1,0 +1,20 @@
+<!-- @rolemodel/turbo-confirm confirmation dialog template -->
+<!-- This template is automatically used to style turbo confirm dialogs rather than using the system. -->
+<%= render DialogComponent.new(
+      id: "confirm",
+      close_on_backdrop: true,
+    ) do |dialog| %>
+  <% dialog.with_body do %>
+    <div class="flex flex-col items-center gap-3 py-2 text-center">
+      <div class="grid place-items-center bg-error/15 text-error rounded-full w-16 h-16">
+        <%= lucide_icon("octagon-alert", class: "w-10 h-10") %>
+      </div>
+      <h3 id="confirm-title" class="text-lg font-bold"></h3><!-- Replaced by `data-turbo-confirm` attribute -->
+      <div id="confirm-body" class="text-base-content/60 text-sm"></div><!-- Replaced by `data-confirm-details` attribute -->
+    </div>
+    <div class="modal-action justify-center gap-2 mt-2">
+      <button class="confirm-cancel btn btn-ghost">Cancel</button>
+      <button id="confirm-accept" class="btn btn-error">Yes, I'm Sure</button>
+    </div>
+  <% end %>
+<% end %>

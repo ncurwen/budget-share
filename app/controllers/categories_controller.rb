@@ -4,8 +4,10 @@ class CategoriesController < ApplicationController
   before_action :set_category, only: %i[edit update destroy]
 
   def index
-    @categories = policy_scope(Category)
     @year = selected_year
+    @q = policy_scope(Category).ransack(params[:q])
+    @q.sorts = "position asc" if @q.sorts.empty?
+    @pagy, @categories = pagy(@q.result)
   end
 
   def new

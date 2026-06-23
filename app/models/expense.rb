@@ -10,6 +10,14 @@ class Expense < ApplicationRecord
 
   monetize :amount_cents
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[title description paid_on amount_cents shared category_id created_at]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[category user]
+  end
+
   validates :title, presence: true
   validates :paid_on, presence: true
   validates :amount_cents, numericality: { greater_than: 0 }
