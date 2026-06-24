@@ -12,20 +12,20 @@ class ExpensesController < ApplicationController
     result = @q.result
     @total_cents = result.sum(:amount_cents)
     @pagy, @expenses = pagy(result)
-    @categories = current_household.categories
+    @categories = Current.household.categories
   end
 
   def new
-    @expense = current_household.expenses.new(paid_on: Date.current, shared: true)
+    @expense = Current.household.expenses.new(paid_on: Date.current, shared: true)
     authorize @expense
   end
 
   def create
-    @expense = current_household.expenses.new(expense_params)
+    @expense = Current.household.expenses.new(expense_params)
     authorize @expense
 
     if @expense.save
-      refresh_with "Expense added."
+      refresh_with "Expense added.", fallback_location: expenses_path
     else
       render :new, status: :unprocessable_content
     end
@@ -39,7 +39,7 @@ class ExpensesController < ApplicationController
     authorize @expense
 
     if @expense.update(expense_params)
-      refresh_with "Expense updated."
+      refresh_with "Expense updated.", fallback_location: expenses_path
     else
       render :edit, status: :unprocessable_content
     end
@@ -48,25 +48,17 @@ class ExpensesController < ApplicationController
   def destroy
     authorize @expense
     @expense.destroy
-    refresh_with "Expense deleted."
+    refresh_with "Expense deleted.", fallback_location: expenses_path
   end
 
   private
 
   def set_expense
-    @expense = current_household.expenses.find(params[:id])
+    @expense = Current.household.expenses.find(params[:id])
   end
 
   def expense_params
     params.require(:expense)
           .permit(:title, :description, :paid_on, :amount, :shared, :category_id, :user_id)
-  end
-
-  def refresh_with(message)
-    flash[:notice] = message
-    respond_to do |format|
-      format.turbo_stream { morph_refresh }
-      format.html { redirect_back fallback_location: expenses_path }
-    end
   end
 end

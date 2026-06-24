@@ -1,6 +1,4 @@
 <%= turbo_frame_tag "modal" do %>
-  <%= render DialogComponent.new(open: true, close_on_backdrop: true) do |dialog| %>
-    <% dialog.with_title { "Add category" } %>
-    <% dialog.with_body { render "form", category: @category } %>
-  <% end %>
+  <h3 class="text-lg font-bold mb-1">Add category</h3>
+  <%= render "form", category: @category %>
 <% end %>

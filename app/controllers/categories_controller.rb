@@ -11,20 +11,16 @@ class CategoriesController < ApplicationController
   end
 
   def new
-    @category = current_household.categories.new
+    @category = Current.household.categories.new
     authorize @category
   end
 
   def create
-    @category = current_household.categories.new(category_params)
+    @category = Current.household.categories.new(category_params)
     authorize @category
 
     if @category.save
-      flash[:notice] = "Category created."
-      respond_to do |format|
-        format.turbo_stream { morph_refresh }
-        format.html { redirect_to categories_path }
-      end
+      refresh_with "Category created.", fallback_location: categories_path
     else
       render :new, status: :unprocessable_content
     end
@@ -41,7 +37,7 @@ class CategoriesController < ApplicationController
     @year = selected_year
 
     if @category.update(category_params)
-      redirect_to categories_path(year: @year), notice: "Category saved."
+      refresh_with "Category saved.", fallback_location: root_path
     else
       render :edit, status: :unprocessable_content
     end
@@ -51,7 +47,7 @@ class CategoriesController < ApplicationController
     authorize @category
 
     if @category.destroy
-      redirect_to categories_path, notice: "Category deleted."
+      refresh_with "Category deleted.", fallback_location: categories_path
     else
       redirect_to categories_path, alert: @category.errors.full_messages.to_sentence
     end
@@ -60,7 +56,7 @@ class CategoriesController < ApplicationController
   private
 
   def set_category
-    @category = current_household.categories.find(params[:id])
+    @category = Current.household.categories.find(params[:id])
   end
 
   def category_params

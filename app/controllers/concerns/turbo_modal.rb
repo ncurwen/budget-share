@@ -1,5 +1,3 @@
-# Shared behaviour for controllers whose new/edit forms load into the page's
-# "modal" Turbo Frame.
 module TurboModal
   extend ActiveSupport::Concern
 
@@ -10,8 +8,15 @@ module TurboModal
 
   private
 
-  # Close the modal and morph the current page. `request_id: nil` stops Turbo from
-  # deduping the refresh against the very form submission that triggered it.
+  def refresh_with(message, fallback_location: root_path)
+    flash[:notice] = message
+    respond_to do |format|
+      format.turbo_stream { morph_refresh }
+      format.html { redirect_back fallback_location: fallback_location }
+    end
+  end
+
+  # `request_id: nil` stops Turbo from deduping the refresh against the very form submission that triggered it.
   def morph_refresh
     render turbo_stream: turbo_stream.refresh(request_id: nil)
   end

@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   before_action :authenticate_user!
+  before_action :set_current
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :require_household
 
@@ -16,14 +17,14 @@ class ApplicationController < ActionController::Base
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-  helper_method :current_household
-
-  # Each user belongs to a single household. Nil until they create or join one.
-  def current_household
-    current_user&.household
-  end
-
   private
+
+  # Populate request-scoped Current with the signed-in user and their household.
+  # Each user belongs to a single household; it's nil until they create or join one.
+  def set_current
+    Current.user = current_user
+    Current.household = current_user&.household
+  end
 
   # The first of the month selected via :year/:month params, defaulting to the
   # current month. Used by the dashboard and expense list.
@@ -43,7 +44,7 @@ class ApplicationController < ActionController::Base
   end
 
   def require_household
-    return if devise_controller? || current_household.present?
+    return if devise_controller? || Current.household.present?
 
     redirect_to new_household_path, notice: "Create a household to get started."
   end

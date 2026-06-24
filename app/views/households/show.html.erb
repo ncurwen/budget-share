@@ -14,7 +14,7 @@
         <% @household.users.order(:name).each do |member| %>
           <li class="py-2">
             <span class="font-medium"><%= member.name %></span>
-            <% if member == current_user %><span class="text-xs text-base-content/50">(you)</span><% end %>
+            <% if member == Current.user %><span class="text-xs text-base-content/50">(you)</span><% end %>
             <div class="text-xs text-base-content/50"><%= member.email %></div>
           </li>
         <% end %>

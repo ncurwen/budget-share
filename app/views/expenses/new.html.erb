@@ -1,6 +1,4 @@
 <%= turbo_frame_tag "modal" do %>
-  <%= render DialogComponent.new(open: true, close_on_backdrop: true) do |dialog| %>
-    <% dialog.with_title { "Add expense" } %>
-    <% dialog.with_body { render "form", expense: @expense } %>
-  <% end %>
+  <h3 class="text-lg font-bold mb-1">Add expense</h3>
+  <%= render "form", expense: @expense %>
 <% end %>

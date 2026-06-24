@@ -22,12 +22,12 @@
     <div class="grid grid-cols-2 gap-3 mt-2">
       <div>
         <label class="label" for="expense_category_id">Category</label>
-        <%= f.collection_select :category_id, current_household.categories, :id, :name,
+        <%= f.collection_select :category_id, Current.household.categories, :id, :name,
               { prompt: "Select…" }, class: "select select-bordered w-full" %>
       </div>
       <div>
         <label class="label" for="expense_user_id">Paid by</label>
-        <%= f.collection_select :user_id, current_household.users.order(:name), :id, :name,
+        <%= f.collection_select :user_id, Current.household.users.order(:name), :id, :name,
               { prompt: "Select…" }, class: "select select-bordered w-full" %>
       </div>
     </div>

@@ -38,6 +38,8 @@ class Expense < ApplicationRecord
   }
   scope :recent_first, -> { order(paid_on: :desc, created_at: :desc) }
 
+  broadcasts_refreshes_to ->(expense) { [ expense.household, :expenses ] }
+
   private
 
   def category_belongs_to_household

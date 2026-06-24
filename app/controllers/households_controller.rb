@@ -4,7 +4,7 @@ class HouseholdsController < ApplicationController
   skip_before_action :require_household
 
   def new
-    redirect_to(root_path) and return if current_household.present?
+    redirect_to(root_path) and return if Current.household.present?
 
     @household = Household.new
     authorize @household
@@ -15,7 +15,7 @@ class HouseholdsController < ApplicationController
     authorize @household
 
     if @household.save
-      current_user.update!(household: @household)
+      Current.user.update!(household: @household)
       redirect_to root_path, notice: "Household created. Invite your partner to get started."
     else
       render :new, status: :unprocessable_content
@@ -23,7 +23,7 @@ class HouseholdsController < ApplicationController
   end
 
   def show
-    @household = current_user.household
+    @household = Current.user.household
     authorize @household
     @invitation = @household.invitations.new
     @pending_invitations = @household.invitations.pending

@@ -3,7 +3,7 @@ class InvitationsController < ApplicationController
   skip_before_action :require_household, only: :accept
 
   def create
-    @invitation = current_household.invitations.new(invitation_params.merge(invited_by: current_user))
+    @invitation = Current.household.invitations.new(invitation_params.merge(invited_by: Current.user))
     authorize @invitation
 
     if @invitation.save
@@ -24,7 +24,7 @@ class InvitationsController < ApplicationController
       return
     end
 
-    invitation.accept!(current_user)
+    invitation.accept!(Current.user)
     redirect_to root_path, notice: "You've joined #{invitation.household.name}."
   end
 

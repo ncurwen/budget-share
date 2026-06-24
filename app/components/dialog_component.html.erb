@@ -1,11 +1,6 @@
-<%# The dialog is always wrapped in a "dialog-component" controller element. It
-    does not emit its own Turbo frame — turbo-loaded dialogs are rendered into
-    the shared `turbo_frame_tag "modal"` declared by the layout/view, and the
-    controller targets that frame by id. %>
 <%= tag.div data: { controller: "dialog-component" } do %>
   <dialog class="modal<%= " #{@css_class}" if @css_class %>"
     data-dialog-component-target="dialog"
-    data-dialog-auto-open="<%= @open %>"
     id="<%= @id %>">
     <div class="modal-box">
       <form method="dialog">

@@ -12,7 +12,7 @@
 
     <div class="flex-none gap-2">
       <%= link_to household_path, class: "btn btn-ghost btn-sm" do %>
-        <span class="hidden sm:inline">🏠 <%= current_household.name %></span>
+        <span class="hidden sm:inline">🏠 <%= Current.household.name %></span>
         <span class="sm:hidden">🏠</span>
       <% end %>
 
@@ -20,11 +20,11 @@
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar avatar-placeholder">
           <div class="bg-neutral text-neutral-content w-9 rounded-full">
-            <span class="text-sm"><%= current_user.name.first&.upcase %></span>
+            <span class="text-sm"><%= Current.user.name.first&.upcase %></span>
           </div>
         </div>
         <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 mt-2 w-52 p-2 shadow">
-          <li class="menu-title"><%= current_user.name %></li>
+          <li class="menu-title"><%= Current.user.name %></li>
           <li><button data-action="theme#toggle">🌓 Toggle theme</button></li>
           <li><%= link_to "Account settings", edit_user_registration_path %></li>
           <li><%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "text-error" %></li>

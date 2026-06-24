@@ -3,6 +3,6 @@ class YearsController < ApplicationController
 
   def show
     @year = selected_year
-    @statement = AnnualStatement.new(current_household, @year)
+    @statement = AnnualStatement.new(Current.household, @year)
   end
 end

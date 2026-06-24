@@ -5,7 +5,7 @@ class OverviewController < ApplicationController
 
   def show
     @date = selected_month_date
-    @statement = MonthlyStatement.new(current_household, @date.year, @date.month)
+    @statement = MonthlyStatement.new(Current.household, @date.year, @date.month)
     @expenses = @statement.expenses
   end
 end
