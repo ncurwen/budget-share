@@ -29,7 +29,7 @@ gem "view_component", "~> 4.12"
 gem "lucide-rails", "~> 0.7"
 
 # Pagination [https://github.com/ddnexus/pagy]
-gem "pagy", "~> 9.3"
+gem "pagy", "~> 43.6"
 # Search/filter query builder [https://github.com/activerecord-hackery/ransack]
 gem "ransack", "~> 4.2"
 
